@@ -1,0 +1,298 @@
+# MetaAhorroProject
+
+**MetaAhorroProject** es una aplicación web desarrollada con **Angular y Firebase** que permite a los usuarios **planificar metas de ahorro personal**, registrar proyecciones financieras y visualizar resultados mediante **gráficas estadísticas**.
+
+La aplicación almacena la información en **Cloud Firestore** y permite que cada usuario gestione únicamente sus propios registros mediante autenticación segura.
+
+---
+
+# Tecnologías utilizadas
+
+## Angular
+
+Framework frontend utilizado para construir la interfaz y lógica de la aplicación.
+
+* **Angular CLI 21**
+
+Angular permite:
+
+* construir la interfaz de usuario
+* manejar formularios
+* gestionar el estado de la aplicación
+* comunicarse con Firebase
+
+---
+
+## Firebase
+
+Plataforma backend en la nube utilizada para autenticación y almacenamiento de datos.
+
+Dependencias instaladas:
+
+* `firebase`
+* `@angular/fire`
+
+Firebase proporciona:
+
+* autenticación de usuarios
+* almacenamiento de datos
+* infraestructura backend sin necesidad de crear un servidor propio
+
+---
+
+## Visualización de datos
+
+Librerías utilizadas para generar gráficas estadísticas en la aplicación.
+
+* `chart.js`
+* `ng2-charts`
+* `@angular/cdk`
+
+Estas librerías permiten convertir datos almacenados en Firestore en **visualizaciones gráficas interactivas**.
+
+---
+
+## Interfaz de usuario
+
+Framework CSS utilizado para diseñar la interfaz.
+
+* **Bootstrap (CDN)**
+
+Bootstrap facilita la creación de:
+
+* formularios
+* tarjetas
+* botones
+* tablas
+* layouts responsivos
+
+---
+
+# Configuración de Firebase
+
+Aplicación registrada en Firebase:
+
+```
+MetaAhorroWeb
+```
+
+Configuración generada desde **Firebase Console**:
+
+```javascript
+// Import the functions you need from the SDKs you need
+import { initializeApp } from "firebase/app";
+import { getAnalytics } from "firebase/analytics";
+
+// Firebase configuration
+const firebaseConfig = {
+  apiKey: "AIzaSyA_Fp1k1ho5NWvPhs1riVzGLrUh83Tw0ME",
+  authDomain: "metaahorroproject.firebaseapp.com",
+  projectId: "metaahorroproject",
+  storageBucket: "metaahorroproject.firebasestorage.app",
+  messagingSenderId: "1033385399110",
+  appId: "1:1033385399110:web:91b7a43c2ecd0a7e7f4b47",
+  measurementId: "G-ZZJ1L1LRQL"
+};
+
+// Initialize Firebase
+const app = initializeApp(firebaseConfig);
+const analytics = getAnalytics(app);
+```
+
+Esta configuración permite que la aplicación Angular se conecte con Firebase.
+
+---
+
+# Servicios de Firebase utilizados
+
+## Authentication
+
+Servicio encargado de gestionar la autenticación de usuarios.
+
+Métodos habilitados:
+
+* **Email / Password**
+* **Google SSO**
+
+Esto permite:
+
+* registro de usuarios
+* inicio de sesión
+* identificación del usuario que crea los registros
+
+---
+
+## Cloud Firestore
+
+Base de datos NoSQL utilizada para almacenar la información generada por los usuarios.
+
+Se utiliza para guardar:
+
+* registros de ahorro
+* datos del usuario autenticado
+* información utilizada para generar estadísticas
+
+Cada registro incluye información como:
+
+* `uid`
+* `displayName`
+* `email`
+* `createdAt`
+* datos del ahorro registrado
+
+---
+
+# Arquitectura del sistema
+
+La arquitectura del proyecto sigue un modelo **Frontend + Backend en la nube**.
+
+```
+Usuario
+   ↓
+Angular (Frontend)
+   ↓
+AngularFire
+   ↓
+Firebase
+   ├ Authentication
+   └ Firestore Database
+```
+
+### Flujo general
+
+1. El usuario accede a la aplicación web.
+2. Angular renderiza la interfaz.
+3. El usuario inicia sesión mediante Firebase Authentication.
+4. Angular se comunica con Firestore mediante AngularFire.
+5. Los datos se almacenan o consultan desde la base de datos.
+6. Los resultados se muestran en la interfaz y en gráficas.
+
+---
+
+# Flujo de la aplicación
+
+El flujo funcional de la aplicación es el siguiente:
+
+```
+Inicio aplicación
+      ↓
+Autenticación de usuario
+      ↓
+Dashboard personal
+      ↓
+Registro de meta de ahorro
+      ↓
+Cálculo de proyección de ahorro
+      ↓
+Almacenamiento en Firestore
+      ↓
+Visualización de estadísticas
+```
+
+---
+
+# Estructura del proyecto
+
+Estructura principal del proyecto Angular:
+
+```
+MetaAhorroProject
+│
+├ node_modules
+├ src
+│
+├ angular.json
+├ package.json
+├ tsconfig.json
+```
+
+---
+
+# Carpeta src
+
+Contiene todo los archivos principales de la aplicación.
+
+```
+src
+│
+├ app
+├ environments
+├ index.html
+├ main.ts
+├ styles.css
+```
+
+---
+
+# Archivos principales del proyecto
+
+## main.ts
+
+Este archivo inicia la aplicación utilizando la configuración definida en `app.config.ts`. A través de:
+bootstrapApplication(App, appConfig)
+
+---
+
+## app.config.ts
+
+Archivo de configuración global de Angular.
+
+Aquí se registran los **servicios utilizados por la aplicación**, como:
+
+* enrutamiento
+* inicialización de Firebase
+* Authentication
+* Firestore
+
+---
+
+## app.ts
+
+Es el **componente principal de la aplicación**.
+
+Contiene la lógica principal como:
+
+* manejo de autenticación
+* conexión con Firebase
+* manejo de formularios
+* lógica de negocio
+
+---
+
+## app.html
+
+Define la **interfaz gráfica principal** de la aplicación.
+
+Aquí se construyen elementos como:
+
+* formularios
+* tablas
+* gráficas
+* componentes visuales
+
+---
+
+## app.css
+
+Archivo de estilos utilizado para personalizar la apariencia de la interfaz.
+
+---
+
+## environments/firebase.ts
+
+Archivo que contiene la configuración de conexión con Firebase.
+
+Permite separar las credenciales del resto del código de la aplicación.
+
+---
+
+# Funcionalidad principal del proyecto
+
+La aplicación permite:
+
+* autenticación de usuarios mediante Firebase
+* registro de metas de ahorro personal
+* cálculo automático de proyección de ahorro
+* almacenamiento de registros en **Cloud Firestore**
+* visualización de estadísticas mediante **gráficas dinámicas**
+* seguimiento del progreso hacia la meta de ahorro
