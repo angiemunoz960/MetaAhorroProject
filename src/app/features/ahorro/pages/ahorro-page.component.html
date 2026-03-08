@@ -1,11 +1,21 @@
-<!-- Formulario de registro de ahorro conectado a un Reactive Form en Angular, con validaciones para cada campo y mensajes de error correspondientes. -->
-
 <div class="container py-4">
   <div class="row justify-content-center">
     <div class="col-12 col-md-8 col-lg-6">
       <div class="card shadow-sm">
         <div class="card-body">
           <h2 class="card-title mb-4">Registrar ahorro</h2>
+
+          @if (successMessage) {
+            <div class="alert alert-success">
+              {{ successMessage }}
+            </div>
+          }
+
+          @if (errorMessage) {
+            <div class="alert alert-danger">
+              {{ errorMessage }}
+            </div>
+          }
 
           <form [formGroup]="ahorroForm" (ngSubmit)="onSubmit()">
             <div class="mb-3">
@@ -88,8 +98,8 @@
               }
             </div>
 
-            <button type="submit" class="btn btn-primary w-100">
-              Guardar ahorro
+            <button type="submit" class="btn btn-primary w-100" [disabled]="loading">
+              {{ loading ? 'Guardando...' : 'Guardar ahorro' }}
             </button>
           </form>
         </div>
