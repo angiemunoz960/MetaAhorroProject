@@ -7,7 +7,7 @@ import {
   User,
 } from 'firebase/auth';
 import { BehaviorSubject } from 'rxjs';
-import { auth } from '../../firebase/firebase.config';
+import { auth } from '../firebase/firebase.config';
 
 @Injectable({
   providedIn: 'root',
