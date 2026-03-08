@@ -1,12 +1,33 @@
-import { Component, signal } from '@angular/core';
-import { RouterOutlet } from '@angular/router';
+import { Component, inject } from '@angular/core';
+import { CommonModule } from '@angular/common';
+import { AuthService } from './core/services/auth.service';
 
 @Component({
   selector: 'app-root',
-  imports: [RouterOutlet],
+  imports: [CommonModule],
   templateUrl: './app.html',
-  styleUrl: './app.css'
+  styleUrl: './app.css',
 })
 export class App {
-  protected readonly title = signal('MetaAhorroProject');
+  private authService = inject(AuthService);
+
+  user$ = this.authService.user$;
+
+  async login() {
+    try {
+      await this.authService.loginWithGoogle();
+      console.log('Inicio de sesión exitoso');
+    } catch (error) {
+      console.error('Error al iniciar sesión con Google:', error);
+    }
+  }
+
+  async logout() {
+    try {
+      await this.authService.logout();
+      console.log('Sesión cerrada');
+    } catch (error) {
+      console.error('Error al cerrar sesión:', error);
+    }
+  }
 }
