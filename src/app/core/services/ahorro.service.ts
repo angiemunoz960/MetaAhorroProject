@@ -4,10 +4,12 @@ import { Injectable } from '@angular/core';
 import {
   addDoc,
   collection,
+  doc,
   getDocs,
   orderBy,
   query,
   serverTimestamp,
+  updateDoc,
   where,
 } from 'firebase/firestore';
 
@@ -42,5 +44,16 @@ export class AhorroService {
       id: doc.id,
       ...doc.data(),
     })) as AhorroRecord[];
+  }
+
+  async actualizarAhorro(
+    id: string,
+    ahorro: Omit<AhorroRecord, 'id' | 'uid' | 'displayName' | 'email' | 'createdAt'>,
+  ): Promise<void> {
+    const ahorroDocRef = doc(db, this.collectionName, id);
+
+    await updateDoc(ahorroDocRef, {
+      ...ahorro,
+    });
   }
 }

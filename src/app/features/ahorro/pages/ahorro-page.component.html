@@ -1,9 +1,11 @@
-<div class="container py-4">
+<div class="container py-4 " #formularioAhorro>
   <div class="row justify-content-center">
     <div class="col-12 col-md-8 col-lg-6">
-      <div class="card shadow-sm mb-4">
+      <div class="card shadow-sm mb-4"  >
         <div class="card-body">
-          <h2 class="card-title mb-4">Registrar ahorro</h2>
+          <h2 class="card-title mb-4" #formularioAhorro>
+            {{ modoEdicion ? 'Editar ahorro' : 'Registrar ahorro' }}
+          </h2>
 
           @if (successMessage) {
           <div class="alert alert-success">
@@ -17,7 +19,7 @@
           </div>
           }
 
-          <form [formGroup]="ahorroForm" (ngSubmit)="onSubmit()">
+          <form [formGroup]="ahorroForm" (ngSubmit)="onSubmit()" >
             <div class="mb-3">
               <label for="nombreAhorro" class="form-label">Nombre del ahorro</label>
               <input id="nombreAhorro" type="text" class="form-control" formControlName="nombreAhorro"
@@ -71,9 +73,17 @@
               }
             </div>
 
-            <button type="submit" class="btn btn-primary w-100" [disabled]="loading">
-              {{ loading ? 'Guardando...' : 'Guardar ahorro' }}
-            </button>
+            <div class="d-grid gap-2">
+              <button type="submit" class="btn btn-primary" [disabled]="loading">
+                {{ loading ? 'Procesando...' : (modoEdicion ? 'Actualizar ahorro' : 'Guardar ahorro') }}
+              </button>
+
+              @if (modoEdicion) {
+              <button type="button" class="btn btn-outline-secondary" (click)="cancelarEdicion()">
+                Cancelar edición
+              </button>
+              }
+            </div>
           </form>
         </div>
       </div>
@@ -102,6 +112,12 @@
                 <strong>Estado:</strong>
                 {{ ahorro.cumplioMeta ? 'Meta cumplida' : 'Meta no cumplida' }}
               </p>
+
+              <div class="mt-3">
+                <button type="button" class="btn btn-sm btn-outline-primary" (click)="editarAhorro(ahorro)">
+                  Editar
+                </button>
+              </div>
             </div>
             }
           </div>

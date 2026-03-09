@@ -7,6 +7,8 @@ import { AuthService } from '../../../core/services/auth.service';
 import { AhorroService } from '../../../core/services/ahorro.service';
 import { AhorroRecord } from '../../../core/models/ahorro-record.model';
 
+import { ViewChild, ElementRef } from '@angular/core';
+
 @Component({
   selector: 'app-ahorro-page',
   standalone: true,
@@ -21,6 +23,12 @@ export class AhorroPageComponent implements OnInit, OnDestroy {
   private ngZone = inject(NgZone);
 
   private subscriptions = new Subscription();
+
+  @ViewChild('formularioAhorro')
+  formularioAhorro!: ElementRef;
+
+  modoEdicion = false;
+  ahorroEditandoId: string | null = null;
 
   ahorroForm!: FormGroup;
   loading = false;
@@ -89,11 +97,11 @@ export class AhorroPageComponent implements OnInit, OnDestroy {
       return;
     }
 
-    try {
-      this.ngZone.run(() => {
-        this.loading = true;
-      });
+    this.ngZone.run(() => {
+      this.loading = true;
+    });
 
+    try {
       const nombreAhorro = this.ahorroForm.value.nombreAhorro as string;
       const descripcionAhorro = this.ahorroForm.value.descripcionAhorro as string;
       const ahorroMensual = Number(this.ahorroForm.value.ahorroMensual);
@@ -104,42 +112,61 @@ export class AhorroPageComponent implements OnInit, OnDestroy {
       const cumplioMeta = ahorroTotal >= meta;
       const diferenciaMeta = ahorroTotal - meta;
 
-      await this.ahorroService.crearAhorro({
-        uid: user.uid,
-        displayName: user.displayName ?? 'Sin nombre',
-        email: user.email ?? 'Sin correo',
-        nombreAhorro,
-        descripcionAhorro,
-        ahorroMensual,
-        meses,
-        meta,
-        ahorroTotal,
-        cumplioMeta,
-        diferenciaMeta,
-      });
-
-      this.ngZone.run(() => {
-        this.successMessage = 'Ahorro guardado correctamente.';
-        this.ahorroForm.reset({
-          nombreAhorro: '',
-          descripcionAhorro: '',
-          ahorroMensual: null,
-          meses: null,
-          meta: null,
+      if (this.modoEdicion && this.ahorroEditandoId) {
+        await this.ahorroService.actualizarAhorro(this.ahorroEditandoId, {
+          nombreAhorro,
+          descripcionAhorro,
+          ahorroMensual,
+          meses,
+          meta,
+          ahorroTotal,
+          cumplioMeta,
+          diferenciaMeta,
         });
-      });
 
-      await this.cargarAhorros();
+        this.ngZone.run(() => {
+          this.successMessage = 'Ahorro actualizado correctamente.';
+        });
+
+        this.cancelarEdicion();
+      } else {
+        await this.ahorroService.crearAhorro({
+          uid: user.uid,
+          displayName: user.displayName ?? 'Sin nombre',
+          email: user.email ?? 'Sin correo',
+          nombreAhorro,
+          descripcionAhorro,
+          ahorroMensual,
+          meses,
+          meta,
+          ahorroTotal,
+          cumplioMeta,
+          diferenciaMeta,
+        });
+
+        this.ngZone.run(() => {
+          this.successMessage = 'Ahorro guardado correctamente.';
+          this.ahorroForm.reset({
+            nombreAhorro: '',
+            descripcionAhorro: '',
+            ahorroMensual: null,
+            meses: null,
+            meta: null,
+          });
+        });
+      }
     } catch (error) {
-      console.error('Error al guardar ahorro:', error);
+      console.error('Error al guardar/actualizar ahorro:', error);
       this.ngZone.run(() => {
-        this.errorMessage = 'Ocurrió un error al guardar el ahorro.';
+        this.errorMessage = 'Ocurrió un error al procesar el ahorro.';
       });
     } finally {
       this.ngZone.run(() => {
         this.loading = false;
       });
     }
+
+    await this.cargarAhorros();
   }
 
   async cargarAhorros(): Promise<void> {
@@ -167,6 +194,48 @@ export class AhorroPageComponent implements OnInit, OnDestroy {
     } finally {
       this.loadingAhorros = false;
       this.cdr.detectChanges();
+    }
+  }
+
+  editarAhorro(ahorro: AhorroRecord): void {
+    this.modoEdicion = true;
+    this.ahorroEditandoId = ahorro.id ?? null;
+
+    this.successMessage = '';
+    this.errorMessage = '';
+
+    this.ahorroForm.patchValue({
+      nombreAhorro: ahorro.nombreAhorro,
+      descripcionAhorro: ahorro.descripcionAhorro,
+      ahorroMensual: ahorro.ahorroMensual,
+      meses: ahorro.meses,
+      meta: ahorro.meta,
+    });
+
+    this.scrollAlFormulario();
+  }
+
+  cancelarEdicion(): void {
+    this.modoEdicion = false;
+    this.ahorroEditandoId = null;
+    this.successMessage = '';
+    this.errorMessage = '';
+
+    this.ahorroForm.reset({
+      nombreAhorro: '',
+      descripcionAhorro: '',
+      ahorroMensual: null,
+      meses: null,
+      meta: null,
+    });
+  }
+
+  scrollAlFormulario(): void {
+    if (this.formularioAhorro) {
+      this.formularioAhorro.nativeElement.scrollIntoView({
+        behavior: 'smooth',
+        block: 'start',
+      });
     }
   }
 
