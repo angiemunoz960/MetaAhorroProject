@@ -1,100 +1,73 @@
 <div class="container py-4">
   <div class="row justify-content-center">
     <div class="col-12 col-md-8 col-lg-6">
-      <div class="card shadow-sm">
+      <div class="card shadow-sm mb-4">
         <div class="card-body">
           <h2 class="card-title mb-4">Registrar ahorro</h2>
 
           @if (successMessage) {
-            <div class="alert alert-success">
-              {{ successMessage }}
-            </div>
+          <div class="alert alert-success">
+            {{ successMessage }}
+          </div>
           }
 
           @if (errorMessage) {
-            <div class="alert alert-danger">
-              {{ errorMessage }}
-            </div>
+          <div class="alert alert-danger">
+            {{ errorMessage }}
+          </div>
           }
 
           <form [formGroup]="ahorroForm" (ngSubmit)="onSubmit()">
             <div class="mb-3">
               <label for="nombreAhorro" class="form-label">Nombre del ahorro</label>
-              <input
-                id="nombreAhorro"
-                type="text"
-                class="form-control"
-                formControlName="nombreAhorro"
-                placeholder="Ej: Viaje a Cartagena"
-              />
+              <input id="nombreAhorro" type="text" class="form-control" formControlName="nombreAhorro"
+                placeholder="Ej: Viaje a Cartagena" />
               @if (nombreAhorroControl?.invalid && nombreAhorroControl?.touched) {
-                <small class="text-danger">
-                  Ingresa un nombre válido de al menos 3 caracteres.
-                </small>
+              <small class="text-danger">
+                Ingresa un nombre válido de al menos 3 caracteres.
+              </small>
               }
             </div>
 
             <div class="mb-3">
               <label for="descripcionAhorro" class="form-label">Descripción</label>
-              <textarea
-                id="descripcionAhorro"
-                class="form-control"
-                rows="3"
-                formControlName="descripcionAhorro"
-                placeholder="Describe brevemente tu objetivo de ahorro"
-              ></textarea>
+              <textarea id="descripcionAhorro" class="form-control" rows="3" formControlName="descripcionAhorro"
+                placeholder="Describe brevemente tu objetivo de ahorro"></textarea>
               @if (descripcionAhorroControl?.invalid && descripcionAhorroControl?.touched) {
-                <small class="text-danger">
-                  Ingresa una descripción válida de al menos 5 caracteres.
-                </small>
+              <small class="text-danger">
+                Ingresa una descripción válida de al menos 5 caracteres.
+              </small>
               }
             </div>
 
             <div class="mb-3">
               <label for="ahorroMensual" class="form-label">Ahorro mensual</label>
-              <input
-                id="ahorroMensual"
-                type="number"
-                class="form-control"
-                formControlName="ahorroMensual"
-                placeholder="Ej: 200000"
-              />
+              <input id="ahorroMensual" type="number" class="form-control" formControlName="ahorroMensual"
+                placeholder="Ej: 200000" />
               @if (ahorroMensualControl?.invalid && ahorroMensualControl?.touched) {
-                <small class="text-danger">
-                  Ingresa un valor mayor a 0.
-                </small>
+              <small class="text-danger">
+                Ingresa un valor mayor a 0.
+              </small>
               }
             </div>
 
             <div class="mb-3">
               <label for="meses" class="form-label">Meses</label>
-              <input
-                id="meses"
-                type="number"
-                class="form-control"
-                formControlName="meses"
-                placeholder="Ej: 6"
-              />
+              <input id="meses" type="number" class="form-control" formControlName="meses" placeholder="Ej: 6" />
               @if (mesesControl?.invalid && mesesControl?.touched) {
-                <small class="text-danger">
-                  Ingresa una cantidad de meses válida.
-                </small>
+              <small class="text-danger">
+                Ingresa una cantidad de meses válida.
+              </small>
               }
             </div>
 
             <div class="mb-3">
               <label for="meta" class="form-label">Meta de ahorro</label>
-              <input
-                id="meta"
-                type="number"
-                class="form-control"
-                formControlName="meta"
-                placeholder="Ej: 1000000"
-              />
+              <input id="meta" type="number" class="form-control" formControlName="meta" placeholder="Ej: 1000000" />
               @if (metaControl?.invalid && metaControl?.touched) {
-                <small class="text-danger">
-                  Ingresa una meta válida mayor a 0.
-                </small>
+              <small class="text-danger">
+                Ingresa una meta válida mayor a 0.
+              </small>
               }
             </div>
 
@@ -102,6 +75,37 @@
               {{ loading ? 'Guardando...' : 'Guardar ahorro' }}
             </button>
           </form>
+        </div>
+      </div>
+
+      <div class="card shadow-sm">
+        <div class="card-body">
+          <h3 class="card-title mb-3">Historial de ahorros</h3>
+
+          @if (loadingAhorros) {
+          <p>Cargando ahorros...</p>
+          } @else if (ahorros.length === 0) {
+          <p class="mb-0">Aún no tienes ahorros registrados.</p>
+          } @else {
+          <div class="d-flex flex-column gap-3">
+            @for (ahorro of ahorros; track ahorro.id) {
+            <div class="border rounded p-3">
+              <h5 class="mb-2">{{ ahorro.nombreAhorro }}</h5>
+              <p class="mb-2 text-muted">{{ ahorro.descripcionAhorro }}</p>
+
+              <p class="mb-1"><strong>Ahorro mensual:</strong> {{ ahorro.ahorroMensual }}</p>
+              <p class="mb-1"><strong>Meses:</strong> {{ ahorro.meses }}</p>
+              <p class="mb-1"><strong>Meta:</strong> {{ ahorro.meta }}</p>
+              <p class="mb-1"><strong>Ahorro total:</strong> {{ ahorro.ahorroTotal }}</p>
+              <p class="mb-1"><strong>Diferencia meta:</strong> {{ ahorro.diferenciaMeta }}</p>
+              <p class="mb-0">
+                <strong>Estado:</strong>
+                {{ ahorro.cumplioMeta ? 'Meta cumplida' : 'Meta no cumplida' }}
+              </p>
+            </div>
+            }
+          </div>
+          }
         </div>
       </div>
     </div>

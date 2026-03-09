@@ -1,10 +1,11 @@
-import { Component, inject } from '@angular/core';
+import { Component, OnDestroy, OnInit, inject, NgZone } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormBuilder, FormGroup, ReactiveFormsModule, Validators } from '@angular/forms';
-import { firstValueFrom } from 'rxjs';
+import { Subscription } from 'rxjs';
 
 import { AuthService } from '../../../core/services/auth.service';
 import { AhorroService } from '../../../core/services/ahorro.service';
+import { AhorroRecord } from '../../../core/models/ahorro-record.model';
 
 @Component({
   selector: 'app-ahorro-page',
@@ -13,15 +14,21 @@ import { AhorroService } from '../../../core/services/ahorro.service';
   templateUrl: './ahorro-page.component.html',
   styleUrl: './ahorro-page.component.css',
 })
-export class AhorroPageComponent {
+export class AhorroPageComponent implements OnInit, OnDestroy {
   private fb = inject(FormBuilder);
   private authService = inject(AuthService);
   private ahorroService = inject(AhorroService);
+  private ngZone = inject(NgZone);
+
+  private subscriptions = new Subscription();
 
   ahorroForm!: FormGroup;
   loading = false;
+  loadingAhorros = true;
   successMessage = '';
   errorMessage = '';
+
+  ahorros: AhorroRecord[] = [];
 
   constructor() {
     this.ahorroForm = this.fb.group({
@@ -33,24 +40,56 @@ export class AhorroPageComponent {
     });
   }
 
+  ngOnInit(): void {
+    const authInitSub = this.authService.authInitialized$.subscribe(async (initialized) => {
+      if (!initialized) {
+        return;
+      }
+
+      const user = this.authService.currentUser;
+
+      if (!user) {
+        this.ngZone.run(() => {
+          this.ahorros = [];
+          this.loadingAhorros = false;
+        });
+        return;
+      }
+
+      await this.cargarAhorros();
+    });
+
+    this.subscriptions.add(authInitSub);
+  }
+
+  ngOnDestroy(): void {
+    this.subscriptions.unsubscribe();
+  }
+
   async onSubmit(): Promise<void> {
-    this.successMessage = '';
-    this.errorMessage = '';
+    this.ngZone.run(() => {
+      this.successMessage = '';
+      this.errorMessage = '';
+    });
 
     if (this.ahorroForm.invalid) {
       this.ahorroForm.markAllAsTouched();
       return;
     }
 
-    try {
-      this.loading = true;
+    const user = this.authService.currentUser;
 
-      const user = await firstValueFrom(this.authService.user$);
-
-      if (!user) {
+    if (!user) {
+      this.ngZone.run(() => {
         this.errorMessage = 'Debes iniciar sesión para guardar un ahorro.';
-        return;
-      }
+      });
+      return;
+    }
+
+    try {
+      this.ngZone.run(() => {
+        this.loading = true;
+      });
 
       const nombreAhorro = this.ahorroForm.value.nombreAhorro as string;
       const descripcionAhorro = this.ahorroForm.value.descripcionAhorro as string;
@@ -76,13 +115,62 @@ export class AhorroPageComponent {
         diferenciaMeta,
       });
 
-      this.successMessage = 'Ahorro guardado correctamente.';
-      this.ahorroForm.reset();
+      this.ngZone.run(() => {
+        this.successMessage = 'Ahorro guardado correctamente.';
+        this.ahorroForm.reset({
+          nombreAhorro: '',
+          descripcionAhorro: '',
+          ahorroMensual: null,
+          meses: null,
+          meta: null,
+        });
+      });
+
+      await this.cargarAhorros();
     } catch (error) {
       console.error('Error al guardar ahorro:', error);
-      this.errorMessage = 'Ocurrió un error al guardar el ahorro.';
+      this.ngZone.run(() => {
+        this.errorMessage = 'Ocurrió un error al guardar el ahorro.';
+      });
     } finally {
-      this.loading = false;
+      this.ngZone.run(() => {
+        this.loading = false;
+      });
+    }
+  }
+
+  async cargarAhorros(): Promise<void> {
+    const user = this.authService.currentUser;
+
+    if (!user) {
+      this.ngZone.run(() => {
+        this.ahorros = [];
+        this.loadingAhorros = false;
+      });
+      return;
+    }
+
+    try {
+      this.ngZone.run(() => {
+        this.loadingAhorros = true;
+        this.errorMessage = '';
+      });
+
+      const ahorros = await this.ahorroService.obtenerAhorrosPorUsuario(user.uid);
+
+      this.ngZone.run(() => {
+        this.ahorros = ahorros;
+      });
+    } catch (error) {
+      console.error('Error al cargar ahorros:', error);
+      this.ngZone.run(() => {
+        this.ahorros = [];
+        this.errorMessage = 'No fue posible cargar el historial de ahorros.';
+      });
+    } finally {
+      this.ngZone.run(() => {
+        this.loadingAhorros = false;
+      });
     }
   }
 

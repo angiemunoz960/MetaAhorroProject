@@ -1,14 +1,13 @@
-// Servicio de autenticación para manejar el login/logout con Google y mantener el estado del usuario en la aplicación.
-
 import { Injectable } from '@angular/core';
+import { BehaviorSubject } from 'rxjs';
 import {
   GoogleAuthProvider,
+  User,
+  onAuthStateChanged,
   signInWithPopup,
   signOut,
-  onAuthStateChanged,
-  User,
 } from 'firebase/auth';
-import { BehaviorSubject } from 'rxjs';
+
 import { auth } from '../firebase/firebase.config';
 
 @Injectable({
@@ -16,20 +15,32 @@ import { auth } from '../firebase/firebase.config';
 })
 export class AuthService {
   private userSubject = new BehaviorSubject<User | null>(null);
-  user$ = this.userSubject.asObservable();
+  readonly user$ = this.userSubject.asObservable();
+
+  private authInitializedSubject = new BehaviorSubject<boolean>(false);
+  readonly authInitialized$ = this.authInitializedSubject.asObservable();
 
   constructor() {
     onAuthStateChanged(auth, (user) => {
       this.userSubject.next(user);
+      this.authInitializedSubject.next(true);
     });
+  }
+
+  get currentUser(): User | null {
+    return this.userSubject.value;
+  }
+
+  get isAuthInitialized(): boolean {
+    return this.authInitializedSubject.value;
   }
 
   async loginWithGoogle() {
     const provider = new GoogleAuthProvider();
-    return await signInWithPopup(auth, provider);
+    return signInWithPopup(auth, provider);
   }
 
   async logout() {
-    return await signOut(auth);
+    return signOut(auth);
   }
 }
