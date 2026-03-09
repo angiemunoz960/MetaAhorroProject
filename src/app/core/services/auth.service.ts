@@ -1,4 +1,4 @@
-import { Injectable } from '@angular/core';
+import { Injectable, NgZone, inject } from '@angular/core';
 import { BehaviorSubject } from 'rxjs';
 import {
   GoogleAuthProvider,
@@ -20,10 +20,14 @@ export class AuthService {
   private authInitializedSubject = new BehaviorSubject<boolean>(false);
   readonly authInitialized$ = this.authInitializedSubject.asObservable();
 
+  private ngZone = inject(NgZone);
+
   constructor() {
     onAuthStateChanged(auth, (user) => {
-      this.userSubject.next(user);
-      this.authInitializedSubject.next(true);
+      this.ngZone.run(() => {
+        this.userSubject.next(user);
+        this.authInitializedSubject.next(true);
+      });
     });
   }
 

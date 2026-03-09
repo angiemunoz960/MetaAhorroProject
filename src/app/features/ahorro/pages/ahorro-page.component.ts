@@ -1,4 +1,4 @@
-import { Component, OnDestroy, OnInit, inject, NgZone } from '@angular/core';
+import { Component, OnDestroy, OnInit, inject, NgZone, ChangeDetectorRef } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormBuilder, FormGroup, ReactiveFormsModule, Validators } from '@angular/forms';
 import { Subscription } from 'rxjs';
@@ -42,21 +42,22 @@ export class AhorroPageComponent implements OnInit, OnDestroy {
 
   ngOnInit(): void {
     const authInitSub = this.authService.authInitialized$.subscribe(async (initialized) => {
-      if (!initialized) {
-        return;
-      }
+      this.ngZone.run(async () => {
+        if (!initialized) {
+          return;
+        }
 
-      const user = this.authService.currentUser;
+        const user = this.authService.currentUser;
 
-      if (!user) {
-        this.ngZone.run(() => {
+        if (!user) {
           this.ahorros = [];
           this.loadingAhorros = false;
-        });
-        return;
-      }
+          this.cdr.detectChanges();
+          return;
+        }
 
-      await this.cargarAhorros();
+        await this.cargarAhorros();
+      });
     });
 
     this.subscriptions.add(authInitSub);
@@ -65,6 +66,8 @@ export class AhorroPageComponent implements OnInit, OnDestroy {
   ngOnDestroy(): void {
     this.subscriptions.unsubscribe();
   }
+
+  private cdr = inject(ChangeDetectorRef);
 
   async onSubmit(): Promise<void> {
     this.ngZone.run(() => {
@@ -143,34 +146,27 @@ export class AhorroPageComponent implements OnInit, OnDestroy {
     const user = this.authService.currentUser;
 
     if (!user) {
-      this.ngZone.run(() => {
-        this.ahorros = [];
-        this.loadingAhorros = false;
-      });
+      this.ahorros = [];
+      this.loadingAhorros = false;
+      this.cdr.detectChanges();
       return;
     }
 
     try {
-      this.ngZone.run(() => {
-        this.loadingAhorros = true;
-        this.errorMessage = '';
-      });
+      this.loadingAhorros = true;
+      this.errorMessage = '';
+      this.cdr.detectChanges();
 
       const ahorros = await this.ahorroService.obtenerAhorrosPorUsuario(user.uid);
 
-      this.ngZone.run(() => {
-        this.ahorros = ahorros;
-      });
+      this.ahorros = ahorros;
     } catch (error) {
       console.error('Error al cargar ahorros:', error);
-      this.ngZone.run(() => {
-        this.ahorros = [];
-        this.errorMessage = 'No fue posible cargar el historial de ahorros.';
-      });
+      this.ahorros = [];
+      this.errorMessage = 'No fue posible cargar el historial de ahorros.';
     } finally {
-      this.ngZone.run(() => {
-        this.loadingAhorros = false;
-      });
+      this.loadingAhorros = false;
+      this.cdr.detectChanges();
     }
   }
 
