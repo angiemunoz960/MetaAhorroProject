@@ -1,0 +1,51 @@
+<div class="container py-4">
+  <h2 class="mb-4">Dashboard</h2>
+
+  @if (loading) {
+    <div class="alert alert-info">
+      Cargando dashboard...
+    </div>
+  }
+
+  @if (errorMessage) {
+    <div class="alert alert-danger">
+      {{ errorMessage }}
+    </div>
+  }
+
+  @if (!loading && !errorMessage) {
+    <div class="row g-3">
+      <div class="col-12 col-md-6">
+        <div class="card shadow-sm h-100">
+          <div class="card-body">
+            <h5 class="card-title">Usuario</h5>
+            <p class="mb-1"><strong>Nombre:</strong> {{ userName }}</p>
+            <p class="mb-1"><strong>Correo:</strong> {{ userEmail }}</p>
+            <p class="mb-0"><strong>Último registro:</strong> {{ ultimoRegistro }}</p>
+          </div>
+        </div>
+      </div>
+
+      <div class="col-12 col-md-6">
+        <div class="card shadow-sm h-100">
+          <div class="card-body">
+            <h5 class="card-title">Resumen</h5>
+            <p class="mb-1"><strong>Total de registros:</strong> {{ totalRegistros }}</p>
+            <p class="mb-1"><strong>Total ahorrado:</strong> {{ totalAhorrado }}</p>
+            <p class="mb-1"><strong>Metas cumplidas:</strong> {{ metasCumplidas }}</p>
+            <p class="mb-0"><strong>Metas pendientes:</strong> {{ metasPendientes }}</p>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <div class="card shadow-sm mt-4">
+      <div class="card-body">
+        <h5 class="card-title">Próximo paso</h5>
+        <p class="mb-0">
+          Aquí después vamos a agregar las dos gráficas del proyecto.
+        </p>
+      </div>
+    </div>
+  }
+</div>
