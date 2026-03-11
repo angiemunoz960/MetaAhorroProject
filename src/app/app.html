@@ -2,31 +2,42 @@
   <h1 class="mb-4">MetaAhorroProject</h1>
 
   @if (user$ | async; as user) {
-    <div class="card p-3 shadow-sm mb-4">
-      <h3>Bienvenido</h3>
-      <p><strong>Nombre:</strong> {{ user.displayName }}</p>
-      <p><strong>Correo:</strong> {{ user.email }}</p>
+  <div class="card p-3 shadow-sm mb-4">
+    <h3>Bienvenido</h3>
+    <p><strong>Nombre:</strong> {{ user.displayName }}</p>
+    <p><strong>Correo:</strong> {{ user.email }}</p>
 
-      @if (user.photoURL) {
-        <img
-          [src]="user.photoURL"
-          [alt]="user.displayName"
-          width="100"
-          class="rounded-circle mb-3"
-        />
-      }
+    @if (user.photoURL) {
+    <img [src]="user.photoURL" [alt]="user.displayName" width="100" class="rounded-circle mb-3" />
+    }
+
+    <!-- BOTONES DE NAVEGACIÓN -->
+    <div class="d-flex gap-2 mb-3">
+
+      <button class="btn btn-primary" routerLink="/dashboard">
+        Dashboard
+      </button>
+
+      <button class="btn btn-success" routerLink="/ahorros">
+        Ahorros
+      </button>
 
       <button class="btn btn-danger" (click)="logout()">
         Cerrar sesión
       </button>
+
     </div>
+
+
+
+  </div>
   } @else {
-    <div class="card p-3 shadow-sm mb-4">
-      <p>No has iniciado sesión.</p>
-      <button class="btn btn-primary" (click)="login()">
-        Iniciar sesión con Google
-      </button>
-    </div>
+  <div class="card p-3 shadow-sm mb-4">
+    <p>No has iniciado sesión.</p>
+    <button class="btn btn-primary" (click)="login()">
+      Iniciar sesión con Google
+    </button>
+  </div>
   }
 
   <router-outlet></router-outlet>
