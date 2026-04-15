@@ -16,12 +16,16 @@ import {
 
 import { db } from '../firebase/firebase.config';
 import { AhorroRecord } from '../models/ahorro-record.model';
+import { Subject } from 'rxjs';
+
 
 @Injectable({
   providedIn: 'root',
 })
 export class AhorroService {
   private readonly collectionName = 'ahorros';
+  private ahorroActualizadoSubject = new Subject<void>();
+ahorroActualizado$ = this.ahorroActualizadoSubject.asObservable();
 
   constructor() {}
 
@@ -32,6 +36,7 @@ export class AhorroService {
       ...ahorro,
       createdAt: serverTimestamp(),
     });
+    this.ahorroActualizadoSubject.next();
   }
 
   async obtenerAhorrosPorUsuario(uid: string): Promise<AhorroRecord[]> {
@@ -61,5 +66,8 @@ export class AhorroService {
   async eliminarAhorro(id: string): Promise<void> {
     const ahorroDocRef = doc(db, this.collectionName, id);
     await deleteDoc(ahorroDocRef);
+    
   }
 }
+
+

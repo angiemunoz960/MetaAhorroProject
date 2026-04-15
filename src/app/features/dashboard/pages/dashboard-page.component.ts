@@ -1,225 +1,133 @@
-import { Component, OnDestroy, OnInit, inject, NgZone, ChangeDetectorRef } from '@angular/core';
+import { Component, OnInit, inject } from '@angular/core';
 import { CommonModule } from '@angular/common';
-import { Subscription } from 'rxjs';
-
-import {
-  Chart,
-  CategoryScale,
-  LinearScale,
-  PointElement,
-  LineElement,
-  BarElement,
-  Title,
-  Tooltip,
-  Legend,
-  LineController,
-  BarController,
-} from 'chart.js';
-
 import { BaseChartDirective } from 'ng2-charts';
+import { ChartConfiguration, ChartType } from 'chart.js';
 
 import { AuthService } from '../../../core/services/auth.service';
-import { AhorroService } from '../../../core/services/ahorro.service';
-import { AhorroRecord } from '../../../core/models/ahorro-record.model';
-
-Chart.register(
-  CategoryScale,
-  LinearScale,
-  PointElement,
-  LineElement,
-  BarElement,
-  Title,
-  Tooltip,
-  Legend,
-  LineController,
-  BarController,
-);
+import {
+  MysqlAhorroService,
+  DashboardReporte
+} from '../../../core/services/mysql-ahorro.service';
 
 @Component({
-  selector: 'app-dashboard-page',
+  selector: 'app-dashboard',
   standalone: true,
   imports: [CommonModule, BaseChartDirective],
   templateUrl: './dashboard-page.component.html',
-  styleUrl: './dashboard-page.component.css',
+  styleUrl: './dashboard-page.component.css'
 })
-export class DashboardPageComponent implements OnInit, OnDestroy {
+export class DashboardPageComponent implements OnInit {
   private authService = inject(AuthService);
-  private ahorroService = inject(AhorroService);
-  private ngZone = inject(NgZone);
-  private cdr = inject(ChangeDetectorRef);
-
-  private subscriptions = new Subscription();
+  private mysqlAhorroService = inject(MysqlAhorroService);
 
   loading = true;
   errorMessage = '';
-
-  userName = '';
-  userEmail = '';
 
   totalRegistros = 0;
   totalAhorrado = 0;
   metasCumplidas = 0;
   metasPendientes = 0;
-  ultimoRegistro = 'Sin registros';
+  ultimoRegistro: string | null = null;
 
-  ahorros: AhorroRecord[] = [];
+  barChartType: ChartType = 'bar';
+  pieChartType: ChartType = 'pie';
+  lineChartType: ChartType = 'line';
 
-  // GRÁFICA DE LÍNEA
-  lineChartLabels: string[] = [];
-  lineChartData = [
-    {
-      data: [] as number[],
-      label: '',
-      fill: false,
-      tension: 0.3,
-      borderColor: '',
-      backgroundColor: '',
-    },
-    {
-      data: [] as number[],
-      label: '',
-      fill: false,
-      tension: 0.3,
-      borderColor: '',
-      backgroundColor: '',
-    },
-  ];
-
-  lineChartOptions = {
-    responsive: true,
-    plugins: {
-      legend: {
-        display: true,
+  barChartData: ChartConfiguration<'bar'>['data'] = {
+    labels: [],
+    datasets: [
+      {
+        data: [],
+        label: 'Ahorro total'
       },
-    },
+      {
+        data: [],
+        label: 'Meta'
+      }
+    ]
   };
 
-  lineChartType: 'line' = 'line';
-
-  // GRÁFICA DE BARRAS
-  barChartLabels: string[] = [];
-  barChartData = [
-    {
-      data: [] as number[],
-      label: '',
-      backgroundColor: '',
-    },
-    {
-      data: [] as number[],
-      label: '',
-      backgroundColor: '',
-    },
-  ];
-
-  barChartOptions = {
-    responsive: true,
-    plugins: {
-      legend: {
-        display: true,
-      },
-    },
+  pieChartData: ChartConfiguration<'pie'>['data'] = {
+    labels: ['Metas cumplidas', 'Metas pendientes'],
+    datasets: [
+      {
+        data: [0, 0]
+      }
+    ]
   };
 
-  barChartType: 'bar' = 'bar';
+  lineChartData: ChartConfiguration<'line'>['data'] = {
+    labels: [],
+    datasets: [
+      {
+        data: [],
+        label: 'Ahorro total'
+      }
+    ]
+  };
 
-  ngOnInit(): void {
-    const authInitSub = this.authService.authInitialized$.subscribe(async (initialized) => {
-      this.ngZone.run(async () => {
-        if (!initialized) {
-          return;
-        }
+  async ngOnInit(): Promise<void> {
+    await this.cargarDashboard();
+  }
 
-        const user = this.authService.currentUser;
+  async cargarDashboard(): Promise<void> {
+    try {
+      this.loading = true;
+      this.errorMessage = '';
 
-        if (!user) {
-          this.errorMessage = 'Debes iniciar sesión para ver la dashboard.';
-          this.loading = false;
-          this.cdr.detectChanges();
-          return;
-        }
+      const user = this.authService.currentUser;
 
-        this.userName = user.displayName ?? 'Sin nombre';
-        this.userEmail = user.email ?? 'Sin correo';
+      if (!user) {
+        this.errorMessage = 'No hay usuario autenticado.';
+        return;
+      }
 
-        try {
-          this.errorMessage = '';
-          this.loading = true;
-          this.cdr.detectChanges();
+      const reporte: DashboardReporte =
+        await this.mysqlAhorroService.obtenerReporteDashboard(user.uid);
 
-          this.ahorros = await this.ahorroService.obtenerAhorrosPorUsuario(user.uid);
+      this.totalRegistros = Number(reporte.resumen.total_registros || 0);
+      this.totalAhorrado = Number(reporte.resumen.total_ahorrado || 0);
+      this.metasCumplidas = Number(reporte.resumen.metas_cumplidas || 0);
+      this.metasPendientes = Number(reporte.resumen.metas_pendientes || 0);
+      this.ultimoRegistro = reporte.resumen.ultimo_registro;
 
-          this.totalRegistros = this.ahorros.length;
-          this.totalAhorrado = this.ahorros.reduce((acc, item) => acc + item.ahorroTotal, 0);
-          this.metasCumplidas = this.ahorros.filter((item) => item.cumplioMeta).length;
-          this.metasPendientes = this.ahorros.filter((item) => !item.cumplioMeta).length;
-
-          if (this.ahorros.length > 0) {
-            const createdAt = this.ahorros[0].createdAt as any;
-
-            if (createdAt?.toDate) {
-              this.ultimoRegistro = createdAt.toDate().toLocaleString('es-CO');
-            }
+      this.barChartData = {
+        labels: reporte.detalle.map(item => item.nombre),
+        datasets: [
+          {
+            data: reporte.detalle.map(item => Number(item.ahorro_total || 0)),
+            label: 'Ahorro total'
+          },
+          {
+            data: reporte.detalle.map(item => Number(item.meta || 0)),
+            label: 'Meta'
           }
+        ]
+      };
 
-          this.prepararGraficas();
-        } catch (error) {
-          console.error('Error al cargar dashboard:', error);
-          this.errorMessage = 'No fue posible cargar la información de la dashboard.';
-        } finally {
-          this.loading = false;
-          this.cdr.detectChanges();
-        }
-      });
-    });
+      this.pieChartData = {
+        labels: ['Metas cumplidas', 'Metas pendientes'],
+        datasets: [
+          {
+            data: [this.metasCumplidas, this.metasPendientes]
+          }
+        ]
+      };
 
-    this.subscriptions.add(authInitSub);
-  }
-
-  prepararGraficas(): void {
-    const ahorrosOrdenados = [...this.ahorros].reverse();
-
-    this.lineChartLabels = ahorrosOrdenados.map(
-      (item, index) => item.nombreAhorro || `Registro ${index + 1}`,
-    );
-
-    this.lineChartData = [
-      {
-        data: ahorrosOrdenados.map((item) => item.meta),
-        label: 'Meta',
-        fill: false,
-        tension: 0.3,
-        borderColor: 'red',
-        backgroundColor: 'red',
-      },
-      {
-        data: ahorrosOrdenados.map((item) => item.ahorroTotal),
-        label: 'Estado actual',
-        fill: false,
-        tension: 0.3,
-        borderColor: 'blue',
-        backgroundColor: 'blue',
-      },
-    ];
-
-    this.barChartLabels = ahorrosOrdenados.map(
-      (item, index) => item.nombreAhorro || `Registro ${index + 1}`,
-    );
-
-    this.barChartData = [
-      {
-        data: ahorrosOrdenados.map((item) => item.meta),
-        label: 'Meta',
-        backgroundColor: 'red',
-      },
-      {
-        data: ahorrosOrdenados.map((item) => item.ahorroTotal),
-        label: 'Estado actual',
-        backgroundColor: 'blue',
-      },
-    ];
-  }
-
-  ngOnDestroy(): void {
-    this.subscriptions.unsubscribe();
+      this.lineChartData = {
+        labels: reporte.detalle.map(item => item.nombre),
+        datasets: [
+          {
+            data: reporte.detalle.map(item => Number(item.ahorro_total || 0)),
+            label: 'Crecimiento de ahorros'
+          }
+        ]
+      };
+    } catch (error) {
+      console.error('Error al cargar dashboard:', error);
+      this.errorMessage = 'No fue posible cargar el dashboard.';
+    } finally {
+      this.loading = false;
+    }
   }
 }

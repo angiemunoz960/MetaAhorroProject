@@ -5,21 +5,19 @@ import { DashboardPageComponent } from './features/dashboard/pages/dashboard-pag
 export const routes: Routes = [
   {
     path: '',
-    redirectTo: 'dashboard',
-    pathMatch: 'full',
-  },
-  {
-    path: 'dashboard',
-    component: DashboardPageComponent,
+    redirectTo: 'ahorros',
+    pathMatch: 'full'
   },
   {
     path: 'ahorros',
-    component: AhorroPageComponent,
+    component: AhorroPageComponent
   },
-
-  //Cualquier ruta que Angular no reconozca → envíala a /dashboard
+  {
+    path: 'dashboard',
+    component: DashboardPageComponent
+  },
   {
     path: '**',
-    redirectTo: 'dashboard',
-  },
+    redirectTo: 'ahorros'
+  }
 ];
