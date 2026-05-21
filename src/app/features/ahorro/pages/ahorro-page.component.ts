@@ -393,7 +393,7 @@ const ahorroConIncremento =
   (1 + porcentajeIncremento / 100);
 
 this.analisis.simulacionAumento10 =
-  ahorroConAumento10 * meses;
+  ahorroConIncremento * meses;
 
   this.analisis.simulacionExtra3Meses =
     ahorroMensual * (meses + 3);
