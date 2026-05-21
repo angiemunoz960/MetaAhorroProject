@@ -1,0 +1,65 @@
+<div class="container mt-5">
+  <h1 class="mb-4">MetaAhorroProject</h1>
+
+  @if (user$ | async; as user) {
+    <div class="card p-3 shadow-sm mb-4">
+      <h3>Bienvenido</h3>
+      <p><strong>Nombre:</strong> {{ user.displayName }}</p>
+      <p><strong>Correo:</strong> {{ user.email }}</p>
+
+      @if (user.photoURL) {
+        <img
+          [src]="user.photoURL"
+          [alt]="user.displayName ?? 'Usuario'"
+          width="100"
+          class="rounded-circle mb-3"
+        />
+      }
+
+      <div class="d-flex gap-2 mb-3 flex-wrap">
+        <button class="btn btn-primary" routerLink="/dashboard">Dashboard</button>
+        <button class="btn btn-success" routerLink="/ahorros">Ahorros</button>
+        <button class="btn btn-danger" (click)="logout()">Cerrar sesion</button>
+      </div>
+    </div>
+  } @else {
+    <div class="card p-3 shadow-sm mb-4">
+      <p>No has iniciado sesion.</p>
+      <button class="btn btn-primary" (click)="login()">Iniciar sesion con Google</button>
+    </div>
+  }
+
+  <div class="row g-3 mb-4">
+    <div class="col-md-4" *ngIf="tasaCOP !== null">
+      <div class="card resumen-card shadow-sm h-100 border-0">
+        <div class="card-body">
+          <h5 class="card-title mb-2">Valor del dolar hoy</h5>
+          <p class="resumen-valor mb-1">{{ tasaCOP | number:'1.0-2' }} COP</p>
+          <small class="text-muted">1 USD en pesos colombianos</small>
+        </div>
+      </div>
+    </div>
+
+    <div class="col-md-4">
+      <div class="card resumen-card shadow-sm h-100 border-0">
+        <div class="card-body">
+          <h5 class="card-title mb-2">Total ahorrado</h5>
+          <p class="resumen-valor mb-1">{{ totalAhorro | number:'1.0-0' }} COP</p>
+          <small class="text-muted">Suma real obtenida desde MySQL</small>
+        </div>
+      </div>
+    </div>
+
+    <div class="col-md-4" *ngIf="totalAhorroUSD !== null">
+      <div class="card resumen-card shadow-sm h-100 border-0">
+        <div class="card-body">
+          <h5 class="card-title mb-2">Equivalente en dolares</h5>
+          <p class="resumen-valor mb-1">{{ totalAhorroUSD | number:'1.2-2' }} USD</p>
+          <small class="text-muted">Conversion aproximada con la tasa actual</small>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <router-outlet></router-outlet>
+</div>

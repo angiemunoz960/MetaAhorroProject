@@ -1,0 +1,74 @@
+<div class="container py-4">
+  <h2 class="mb-4">Dashboard de ahorros</h2>
+
+  @if (loading) {
+    <p>Cargando dashboard...</p>
+  } @else if (errorMessage) {
+    <div class="alert alert-danger">{{ errorMessage }}</div>
+  } @else {
+    <div class="row g-3 mb-4">
+      <div class="col-md-3">
+        <div class="card shadow-sm">
+          <div class="card-body">
+            <h5>Total registros</h5>
+            <p class="fs-4 mb-0">{{ totalRegistros }}</p>
+          </div>
+        </div>
+      </div>
+
+      <div class="col-md-3">
+        <div class="card shadow-sm">
+          <div class="card-body">
+            <h5>Total ahorrado</h5>
+            <p class="fs-4 mb-0">{{ totalAhorrado | number:'1.0-0' }}</p>
+          </div>
+        </div>
+      </div>
+
+      <div class="col-md-3">
+        <div class="card shadow-sm">
+          <div class="card-body">
+            <h5>Metas cumplidas</h5>
+            <p class="fs-4 mb-0">{{ metasCumplidas }}</p>
+          </div>
+        </div>
+      </div>
+
+      <div class="col-md-3">
+        <div class="card shadow-sm">
+          <div class="card-body">
+            <h5>Ultimo registro</h5>
+            <p class="mb-0">
+              {{ ultimoRegistro ? (ultimoRegistro | date:'medium') : 'Sin registros' }}
+            </p>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <div class="row g-4">
+      <div class="col-lg-8">
+        <div class="card shadow-sm h-100">
+          <div class="card-body">
+            <h4 class="mb-3">Ahorro total vs meta</h4>
+            <canvas baseChart [data]="barChartData" [type]="barChartType"></canvas>
+          </div>
+        </div>
+      </div>
+
+      <div class="col-lg-4">
+        <div class="card shadow-sm h-100">
+          <div class="card-body">
+            <h4 class="mb-3">Estado de metas</h4>
+            <canvas baseChart [data]="pieChartData" [type]="pieChartType"></canvas>
+
+            <div class="mt-3">
+              <p class="mb-1"><strong>Metas cumplidas:</strong> {{ metasCumplidas }}</p>
+              <p class="mb-0"><strong>Metas pendientes:</strong> {{ metasPendientes }}</p>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  }
+</div>

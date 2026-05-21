@@ -1,0 +1,86 @@
+9. Proyección detallada de ahorro personal
+
+Contexto
+Una app financiera permite planificar ahorros a mediano plazo.
+
+- Propósito académico
+Calculo progresivo y evaluación de metas.
+
+- Datos de entrada
+Ahorro mensual
+Meses
+Meta de Ahorro
+
+- Fórmulas y condiciones
+Ahorro total ahorro mensual meses
+Determinar si la meta fue alcanzada
+Calcular diferencia respecto a la meta
+
+- Fórmulas y condiciones
+Ahorro total ahorro mensual meses
+Determinar si la meta fue alcanzada
+Calcular diferencia respecto a la meta
+
+- Gráficas obligatorias
+Linea crecimiento del ahorr
+Barras: ahorro vs meta
+
+
+
+
+
+
+## REQUERIMIENTOS GENERALES (APLICAN A TODOS LOS EJERCICIOS)
+
+### Autenticación y reporte inicial
+
+- Autenticación obligatoria mediante **Google SSO (Firebase Authentication)**.
+- Al iniciar sesión, la aplicación debe mostrar un **reporte personalizado** con:
+    - Nombre del usuario autenticado
+    - Correo electrónico
+    - Fecha del último registro almacenado
+    - Cantidad total de registros creados por el usuario
+
+### Persistencia y seguridad
+
+- Uso obligatorio MYSQL (Ya no se almacenan en firebase)
+- El usuario solo puede visualizar **sus propios datos**.
+
+### Visualización
+
+- Cada ejercicio debe generar **mínimo dos gráficas estadísticas**.
+- Las gráficas deben construirse **exclusivamente con datos reales almacenados en MYSQL**.
+
+**APIS**
+
+- Cada ejercicio de consumir un api REST externa alusiva al tema de desarrollo del proyecto, o en su defecto crear una estructura de datos con Mock API y mostrarla
+
+
+
+## 🧩 EJERCICIO 9 – Proyección Detallada de Ahorro Personal (Diego Muñoz - Angelly Muñoz )
+
+### 📌 Contexto
+
+Una app financiera permite planificar ahorros a mediano plazo.
+
+### 🎯 Propósito académico
+
+Cálculo progresivo y evaluación de metas.
+
+### 📥 Datos de entrada
+
+- Ahorro mensual
+- Meses
+- Meta de ahorro
+
+### 🧮 Fórmulas y condiciones
+
+- Ahorro total = ahorro mensual × meses
+- Determinar si la meta fue alcanzada
+- Calcular diferencia respecto a la meta
+
+### 📊 Gráficas obligatorias
+
+- Línea: crecimiento del ahorro
+- Barras: ahorro vs meta
+- API consumida

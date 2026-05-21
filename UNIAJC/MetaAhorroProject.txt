@@ -1,0 +1,50 @@
+# MetaAhorroProject
+
+Aplicación web desarrollada con **Angular** para planificar metas de ahorro personal, autenticarse con **Firebase Authentication**, almacenar los registros en **MySQL** mediante una **API PHP**, y visualizar resultados mediante **gráficas estadísticas**.
+
+---
+
+# Tecnologías utilizadas
+
+## Frontend
+
+- **Angular CLI 21**
+- **TypeScript**
+- **Bootstrap** (CDN)
+
+## Autenticación
+
+- **Firebase Authentication**
+- Inicio de sesión con **Google SSO**
+
+## Base de datos
+
+- **MySQL**
+
+## Backend / API
+
+- **PHP**
+- Conexión a MySQL mediante archivos PHP para:
+  - crear ahorros
+  - listar ahorros
+  - actualizar ahorros
+  - eliminar ahorros
+
+## Gráficas
+
+- `chart.js`
+- `ng2-charts`
+- `@angular/cdk`
+
+---
+
+# Arquitectura actual del proyecto
+
+El proyecto trabaja con la siguiente estructura:
+
+```text
+Angular (frontend)
+   ↓
+API PHP
+   ↓
+MySQL
