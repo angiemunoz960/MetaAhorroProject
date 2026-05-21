@@ -89,7 +89,25 @@ export class AhorroPageComponent implements OnInit, OnDestroy {
 
   ahorros: AhorroRecordMysql[] = [];
 
+  analisis = {
+  alcanzaraMeta: false,
+
+  faltante: 0,
+
+  ahorroNecesarioMensual: 0,
+
+  diferenciaMensual: 0,
+
+  simulacionExtra20: 0,
+
+  simulacionExtra3Meses: 0,
+};
+
   ngOnInit(): void {
+    
+    this.ahorroForm.valueChanges.subscribe(() => {
+  this.calcularAnalisis();
+});
     this.subscriptions.add(
       this.authService.user$.subscribe(async (user) => {
         if (!user) {
@@ -327,6 +345,53 @@ export class AhorroPageComponent implements OnInit, OnDestroy {
       });
     }
   }
+
+  calcularAnalisis(): void {
+  const ahorroMensual = Number(
+    this.ahorroForm.value.ahorroMensual
+  );
+
+  const meses = Number(
+    this.ahorroForm.value.meses
+  );
+
+  const meta = Number(
+    this.ahorroForm.value.meta
+  );
+
+  if (
+    !ahorroMensual ||
+    !meses ||
+    !meta
+  ) {
+    return;
+  }
+
+  const ahorroTotal =
+    ahorroMensual * meses;
+
+  this.analisis.alcanzaraMeta =
+    ahorroTotal >= meta;
+
+  this.analisis.faltante =
+    Math.max(meta - ahorroTotal, 0);
+
+  this.analisis.ahorroNecesarioMensual =
+    meta / meses;
+
+  this.analisis.diferenciaMensual =
+    Math.max(
+      this.analisis.ahorroNecesarioMensual -
+        ahorroMensual,
+      0
+    );
+
+  this.analisis.simulacionExtra20 =
+    (ahorroMensual + 20) * meses;
+
+  this.analisis.simulacionExtra3Meses =
+    ahorroMensual * (meses + 3);
+}
 
   private construirPayload(
     uid: string,

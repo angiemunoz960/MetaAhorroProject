@@ -106,6 +106,63 @@
               }
             </div>
           </form>
+
+<div class="analisis-container mt-4">
+
+  <h3>Analisis Inteligente</h3>
+
+  <div *ngIf="analisis.alcanzaraMeta">
+    <p class="text-success">
+      ✅ Alcanzaras tu meta financiera.
+    </p>
+  </div>
+
+  <div *ngIf="!analisis.alcanzaraMeta">
+
+    <p class="text-danger">
+      ❌ No alcanzarás tu meta.
+    </p>
+
+    <p>
+      Te faltarán:
+      <strong>
+        {{ analisis.faltante | number:'1.0-2' }}
+      </strong>
+      USD
+    </p>
+
+    <p>
+      Debes ahorrar:
+      <strong>
+        {{ analisis.diferenciaMensual | number:'1.0-2' }}
+      </strong>
+      USD más por mes
+    </p>
+
+  </div>
+
+  <hr>
+
+  <h4>Simulaciones</h4>
+
+  <p>
+    Si aumentas 20 USD por mes:
+    <strong>
+      {{ analisis.simulacionExtra20 | number:'1.0-2' }}
+    </strong>
+    USD
+  </p>
+
+  <p>
+    Si ahorras 3 meses más:
+    <strong>
+      {{ analisis.simulacionExtra3Meses | number:'1.0-2' }}
+    </strong>
+    USD
+  </p>
+
+</div>
+
         </div>
       </div>
 
