@@ -98,7 +98,7 @@ export class AhorroPageComponent implements OnInit, OnDestroy {
 
   diferenciaMensual: 0,
 
-  simulacionExtra20: 0,
+  simulacionAumento10: 0,
 
   simulacionExtra3Meses: 0,
 };
@@ -386,10 +386,13 @@ export class AhorroPageComponent implements OnInit, OnDestroy {
       0
     );
 
-const ahorroConAumento10 =
-ahorroMensual * 1.1;
+const porcentajeIncremento = 10;
 
-this.analisis.simulacionExtra20 =
+const ahorroConIncremento =
+  ahorroMensual *
+  (1 + porcentajeIncremento / 100);
+
+this.analisis.simulacionAumento10 =
   ahorroConAumento10 * meses;
 
   this.analisis.simulacionExtra3Meses =
