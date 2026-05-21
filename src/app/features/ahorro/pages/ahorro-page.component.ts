@@ -104,7 +104,7 @@ export class AhorroPageComponent implements OnInit, OnDestroy {
 };
 
   ngOnInit(): void {
-    
+
     this.ahorroForm.valueChanges.subscribe(() => {
   this.calcularAnalisis();
 });
@@ -386,8 +386,11 @@ export class AhorroPageComponent implements OnInit, OnDestroy {
       0
     );
 
-  this.analisis.simulacionExtra20 =
-    (ahorroMensual + 20) * meses;
+const ahorroConAumento10 =
+ahorroMensual * 1.1;
+
+this.analisis.simulacionExtra20 =
+  ahorroConAumento10 * meses;
 
   this.analisis.simulacionExtra3Meses =
     ahorroMensual * (meses + 3);
