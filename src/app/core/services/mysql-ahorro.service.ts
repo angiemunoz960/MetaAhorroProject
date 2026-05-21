@@ -44,7 +44,7 @@ export class MysqlAhorroService {
   private readonly http = inject(HttpClient);
 
  private readonly apiBaseUrl =
-  'https://backend-meta-ahorro.onrender.com/api/ahorros';
+  'https://metaahorro-backend.onrender.com/api/ahorros';
 
   private readonly ahorroActualizadoSubject = new Subject<void>();
 

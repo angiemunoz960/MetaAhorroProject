@@ -1,8 +1,6 @@
-//Credenciales para acceder a la base de datos
-
 export const environment = {
-  production: false,
-  apiUrl: 'http://localhost:3000',  // para desarrollo local
+  production: true,
+  apiUrl: 'https://metaahorro-backend.onrender.com',
   firebaseConfig: {
     apiKey: 'AIzaSyA_Fp1k1ho5NWvPhs1riVzGLrUh83Tw0ME',
     authDomain: 'metaahorroproject.firebaseapp.com',

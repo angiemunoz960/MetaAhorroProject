@@ -8,7 +8,7 @@ import { Subject } from 'rxjs';
 })
 export class AhorroService {
 
-  private apiUrl = 'http://localhost:3000/api/ahorros';
+  private apiUrl = 'https://metaahorro-backend.onrender.com';
 
   ahorroActualizado$ = new Subject<void>();
 
